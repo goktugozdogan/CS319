@@ -11,5 +11,9 @@ public class MainMenu {
 	
 	public MainMenu() {
 		text = new JTextField(15);
+		sp = new JButton("Single Player ");
+		label = new JLabel( "Head Ball");
+		
 	}
+	
 }

@@ -9,56 +9,72 @@ public class MainPanel extends JPanel{
 	private final int WIDTH = 1200, HEIGHT = 800; // size of screen
 	private ImageIcon goal1, goal2, stadium;
 	private JButton reset;
+	private Goal goalLeft, goalRigth;
+	private Ball ball;
 	
 	// ronaldo
 	private ImageIcon ronaldo;
 	private Timer timerRonaldo, timerJumpRonaldo;
-	private int ronaldoX, ronaldoY;
-	private int ronaldoSpeed;
-	private int ronaldoJump;
-	private boolean ronadloDirectionX, ronaldoDirectionY;
+	private Player r;
+	private JPanel scorePanel;
 	
 	// neymar
 	private final int JUMP_DELAY = 40;
 	private ImageIcon neymar;
 	private Timer timerNeymar, timerJumpNeymar;
-	private int neymarX, neymarY; // location of neymar
-	private int neymarSpeedX; // speed on x-axis
-	private int jump;// speed on y-axis
-	private boolean directionX, directionY; // for keyboard keys
+	private Player l;
+	private int score1, score2;
+
 	
 	
 	// ball
 	private final int DELAY = 20; //BALL_SIZE = 45;
-	private ImageIcon ball;
+	private ImageIcon ballimg;
 	private Timer timer;
-	private int ballX, ballY; // location of ball
-	private int speedX, speedY; // speed of ball
-	
+	private JLabel scoreLabel1,scoreLabel2;
 	
 	
 	public MainPanel(){
+		goalLeft = new Goal();
+		goalRigth = new Goal();
+		
+		ball = new Ball();
+		r= new Player();
+		l = new Player();
+		scoreLabel1 = new JLabel( " score 1 " + score1);
+		scoreLabel1.setText(" score 1 " + score1);
+		scoreLabel1.setVisible(true);
+		scoreLabel1.setBackground(Color.RED);
+		scoreLabel2 = new JLabel( " score 2 " + score2);
+		this.add(scoreLabel1);
 		reset = new JButton("Press 'R' to reset");
 		reset.setEnabled(false);
-		add(reset);
 		
+		
+		goalLeft.setSize(550);
+		goalRigth.setSize(550);
+		
+		add(reset);
+		score1 = 0;
+		score2 = 0;
 		addKeyListener(new ButtonListener());
+		
 		// ronaldo
 		addKeyListener(new RonaldoListener());
-		ronaldoX = 120;
-		ronaldoY = 611;
-		ronaldoSpeed = 3;
-		ronaldoJump = 18;
+		r.setX(120);
+		r.setY(611);
+		r.setSpeed(3);
+		r.setJump(18);
 		ronaldo = new ImageIcon("images/ronaldo.png");
 		timerRonaldo = new Timer(DELAY, new RonaldoSmoothMovement());
 		timerJumpRonaldo = new Timer(JUMP_DELAY, new RonaldoSmoothJump());
 		
 		// neymar
 		addKeyListener(new NeymarListener());
-		neymarX = 800;
-		neymarY = 617;
-		neymarSpeedX = 4;
-		jump = 14;
+		l.setX(800);
+		l.setY(617);
+		l.setSpeed(4);
+		l.setJump(14);
 	    neymar = new ImageIcon("images/neymar.png");
 	    timerNeymar = new Timer(DELAY, new NeymarSmoothMovement());
 	    timerJumpNeymar = new Timer(JUMP_DELAY, new NeymarSmoothJump());
@@ -75,11 +91,14 @@ public class MainPanel extends JPanel{
 	    
 	    // ball
 	    timer = new Timer(DELAY, new BallListener());
-	    ball = new ImageIcon ("images/ball.png");
-	    ballX = 800; //465;
-	    ballY = 600; //265;
-	    speedX = -10;
-	    speedY = 10;
+	    ballimg = new ImageIcon ("images/ball.png");
+	  //  ballX = 800; //465;
+	   // ballY = 600; //265;
+	    ball.setBallX(125);
+	    ball.setBallY(600);
+	    ball.setSpeedY(10);
+	    ball.setSpeedX(-10);
+	   
 	    timer.start();
 	    
 	    setBackground (Color.green);
@@ -98,11 +117,11 @@ public class MainPanel extends JPanel{
 	    g1.drawRect(100, 100, WIDTH - 200, HEIGHT - 200);
 	    
 	    // add images
-	    goal1.paintIcon(this, page, -4, 550);
-	    goal2.paintIcon(this, page, 1095, 550);
-	    neymar.paintIcon (this, page, neymarX, neymarY);
-	    ronaldo.paintIcon(this, page, ronaldoX, ronaldoY);
-	    ball.paintIcon (this, page, ballX, ballY);   
+	    goal1.paintIcon(this, page, -4, goalRigth.getSize());
+	    goal2.paintIcon(this, page, 1095, goalLeft.getSize());
+	    neymar.paintIcon (this, page, l.getX(), l.getY());
+	    ronaldo.paintIcon(this, page, r.getX(), r.getY());
+	    ballimg.paintIcon (this, page, ball.getBallX(), ball.getBallY());   
 	}
 	
 	public void runNeymar(){
@@ -131,10 +150,11 @@ public class MainPanel extends JPanel{
 		public void keyPressed(KeyEvent event){
 			switch (event.getKeyCode()){
             case KeyEvent.VK_R:
-				ballX = 800; //465;
-			    ballY = 600; //265;
-			    speedX = -20;
-			    speedY = 20;
+				ball.setBallX(125);
+				ball.setBallY(600);
+				ball.setSpeedX(20);
+				ball.setBallY(20);
+			    
 			}
 		}
 		public void keyTyped (KeyEvent event) {}
@@ -142,28 +162,29 @@ public class MainPanel extends JPanel{
 	}
 	private class NeymarSmoothJump implements ActionListener{
 		public void actionPerformed(ActionEvent e){
-			if ( directionY ){
-				neymarY -= jump;
-				if ( jump >= -11)
-					jump -= 1;
+			if ( l.getDirY() ){
+				l.setY(l.getY()-l.getJump());
+				
+				if ( l.getJump()>= -11)
+					l.setJump(l.getJump()-1);
 			}
-			if ( neymarY >= 614 ){
-				directionY = false;
-				jump = 14;
+			if ( l.getY() >= 614 ){
+				l.setDirY(false);
+				l.setJump(14);
 			}
 		}
 	}
 	
 	private class RonaldoSmoothJump implements ActionListener{
 		public void actionPerformed(ActionEvent e){
-			if ( ronaldoDirectionY ){
-				ronaldoY -= ronaldoJump;
-				if ( ronaldoJump >= -14)
-					ronaldoJump -= 1;
+			if ( r.getDirY()){
+				r.setY(r.getY()-r.getJump());
+				if ( r.getJump() >= -14)
+					r.setJump(r.getJump()-1);
 			}
-			if ( ronaldoY >= 614 ){
-				ronaldoDirectionY = false;
-				ronaldoJump = 18;
+			if ( r.getY() >= 614 ){
+				r.setDirY(false);
+				r.setJump(18);
 			}
 		}
 	}
@@ -172,7 +193,7 @@ public class MainPanel extends JPanel{
 		public void keyPressed(KeyEvent event){
 			switch (event.getKeyCode()){
 	            case KeyEvent.VK_W:
-	            	ronaldoDirectionY = true;
+	            	r.setDirY(true);
 	            	//neymarY -= JUMP;
 	            	jumpRonaldo();
 	            	break;
@@ -184,11 +205,11 @@ public class MainPanel extends JPanel{
 	            	break;
 	            */
 	            case KeyEvent.VK_A:
-	            	ronadloDirectionX = false;
+	            	r.setDirX(false);
 	            	runRonaldo();
 	            	break;
 	            case KeyEvent.VK_D:
-	            	ronadloDirectionX = true;
+	            	r.setDirX(true);
 	            	runRonaldo();
 	            	break;
 	         }
@@ -198,7 +219,7 @@ public class MainPanel extends JPanel{
 	    public void keyReleased (KeyEvent event) {
 	    	switch (event.getKeyCode()){
             case KeyEvent.VK_W:
-            	ronaldoY -= ronaldoSpeed;
+            	r.setY(r.getY()-r.getSpeed());
             	stopRonaldo();
             	break;
             /*
@@ -208,11 +229,11 @@ public class MainPanel extends JPanel{
             	break;
             */
             case KeyEvent.VK_A:
-            	ronaldoX -= ronaldoSpeed;
+            	r.setX(r.getX()-r.getSpeed());
             	stopRonaldo();
             	break;
             case KeyEvent.VK_D:
-            	ronaldoX += ronaldoSpeed;
+            	r.setX(r.getX()-r.getSpeed());
             	stopRonaldo();
             	break;
          }
@@ -222,18 +243,18 @@ public class MainPanel extends JPanel{
 	
 	private class NeymarSmoothMovement implements ActionListener{
 		public void actionPerformed(ActionEvent event){
-			if ( directionX )
-				neymarX += neymarSpeedX;
-			else if ( !directionX )
-				neymarX -= neymarSpeedX;
+			if ( l.getDirX() )
+				l.setX(l.getX()+l.getSpeed());
+			else if ( !l.getDirX() )
+				l.setX(l.getX()-l.getSpeed());
 		}
 	}
 	private class RonaldoSmoothMovement implements ActionListener{
 		public void actionPerformed(ActionEvent event){
-			if ( ronadloDirectionX )
-				ronaldoX += ronaldoSpeed;
-			else if ( !ronadloDirectionX )
-				ronaldoX -= ronaldoSpeed;
+			if ( r.getDirX() )
+				r.setX(r.getX()+r.getSpeed());
+			else if ( !r.getDirX() )
+				r.setX(r.getX()-r.getSpeed());
 
 		}
 	}
@@ -242,7 +263,8 @@ public class MainPanel extends JPanel{
 		public void keyPressed(KeyEvent event){
 			switch (event.getKeyCode()){
 	            case KeyEvent.VK_UP:
-	            	directionY = true;
+	            	l.setDirY(true);
+	            	
 	            	//neymarY -= JUMP;
 	            	jumpNeymar();
 	            	break;
@@ -254,11 +276,11 @@ public class MainPanel extends JPanel{
 	            	break;
 	            */
 	            case KeyEvent.VK_LEFT:
-	            	directionX = false;
+	            	l.setDirX(false);
 	            	runNeymar();
 	            	break;
 	            case KeyEvent.VK_RIGHT:
-	            	directionX = true;
+	            	l.setDirX(true);
 	            	runNeymar();
 	            	break;
 	         }
@@ -268,7 +290,7 @@ public class MainPanel extends JPanel{
 	    public void keyReleased (KeyEvent event) {
 	    	switch (event.getKeyCode()){
             case KeyEvent.VK_UP:
-            	neymarY -= neymarSpeedX;
+            	l.setY(l.getY()-l.getSpeed());
             	stopNeymar();
             	break;
             /*
@@ -278,11 +300,11 @@ public class MainPanel extends JPanel{
             	break;
             */
             case KeyEvent.VK_LEFT:
-            	neymarX -= neymarSpeedX;
+            	l.setX(l.getX()-l.getSpeed());
             	stopNeymar();
             	break;
             case KeyEvent.VK_RIGHT:
-            	neymarX += neymarSpeedX;
+            	l.setX(l.getX()-l.getSpeed());
             	stopNeymar();
             	break;
          }
@@ -290,72 +312,83 @@ public class MainPanel extends JPanel{
 	    }
 	}//ImageListener
 	
-	private class BallListener implements ActionListener{
+	public class BallListener implements ActionListener{
 		public void actionPerformed(ActionEvent event){
-			ballX += speedX;
-			ballY += speedY;
+			ball.setBallX(ball.getBallX()+ ball.getSpeedX());
+			ball.setBallY(ball.getBallY()+ ball.getSpeedY());
+			
 			//gravity
-			if(speedY<0)
-				speedY += 1;
-			if(speedY>0)
-				speedY += 1;
-			if(speedY == 0)
-				speedY += 1;
+			while(ball.getSpeedY() <= 300 || ball.getSpeedY() >=-300) {
+				if(ball.getSpeedY()<0)
+					ball.setSpeedY(ball.getBallY()+1);
+				if(ball.getSpeedY()>0)
+					ball.setSpeedY(ball.getSpeedY()+1);
+				if(ball.getSpeedY() == 0)
+					ball.setSpeedY(ball.getSpeedY()+1);
+			}
+	
+			
 			
 			
 			// check goal 1
-	        if ( ballX <= 100 && ballY >= 550 ){
-	        	speedX = 1;
-	        	speedY = 1;
-	        	if ( ballX <= 23 )
-	    			speedX = 0;
-		        if ( ballY >= 660)
-		        	speedY = 0;
+	        if ( ball.getBallX() <= 100 && ball.getBallY() >= goalRigth.getSize() ){
+	        	ball.setSpeedX(1);
+	        	ball.setSpeedY(1);
+	        	
+	        	score1 += 1;
+	        	if ( ball.getBallX() <= 23 )
+	    			ball.setSpeedX(0);
+		        if ( ball.getBallY() >= 660)
+		        	ball.setSpeedY(0);
 	        }
 	        
 	        // check goal 2
-	        if ( ballX >= 1055 && ballY >= 550 ){
-	        	speedX = -1;
-	        	speedY = 1;
-	        	if ( ballX >= 1132 )
-	    			speedX = 0;
-		        if ( ballY >= 660)
-		        	speedY = 0;
+	        if ( ball.getBallX() >= 1055 && ball.getBallY() >= goalLeft.getSize() ){
+	        	ball.setSpeedX(-1);
+	        	ball.setSpeedY(1);
+	        	score2 += 1;
+	        	if ( ball.getBallX() >= 1132 )
+	        		ball.setSpeedX(0);
+		        if ( ball.getBallY() >= 660)
+		        	ball.setSpeedY(0);
 	        }
 	        
 	        // neymar & ball collision
-	        if ( (neymarY+78 >= ballY+22 && neymarY <= ballY+22) && (neymarX + 34 >= ballX + 22 && neymarX <= ballX + 22 ))
+	        if ( (l.getY()+78 >= ball.getBallY()+22 && l.getY()<= ball.getBallY()+22)
+	        		&& (l.getX() + 34 >= ball.getBallX() + 22 && l.getX()<= ball.getBallX() + 22 ))
 	        {
-	        	speedX *= -1;
-	        	speedY *= -1;
-	        	if(speedY < 0)
-	        		speedY -= 3;
-	        	if(speedY > 0)
-	        		speedY += 3;
+	        	ball.setSpeedX(-(ball.getSpeedX()));
+	        	ball.setSpeedY(-(ball.getSpeedY()));
+	        	if(ball.getSpeedY() < 0)
+	        		ball.setSpeedY(-3 +(ball.getSpeedX()));
+	        	if(ball.getSpeedY() > 0)
+	        		ball.setSpeedY(+3 +(ball.getSpeedY()));
 	        }
 	        
 	        // ronaldo & ball collision
-	        if ( (ronaldoY + 84 >= ballY + 22 && ronaldoY <= ballY + 22) && (ronaldoX + 34 >= ballX + 22 && ronaldoX <= ballX + 22 ))
+	        if ( (r.getY() + 84 >= ball.getBallY() + 22 && r.getY() <= ball.getBallY() + 22) 
+	        		&& (r.getX() + 34 >= ball.getBallX()+ 22 && r.getX() <= ball.getBallX() + 22 ))
 	        {
-	        	speedX *= -1;
-	        	speedY *= -1;
-	        	if(speedY < 0)
-	        		speedY -= 3;
-	        	if(speedY > 0)
-	        		speedY += 3;
+	        	ball.setSpeedX(-(ball.getSpeedX()));
+	        	ball.setSpeedY(-(ball.getSpeedY()));
+	        	if(ball.getSpeedY() < 0) 
+	        		ball.setSpeedY(-3 +(ball.getSpeedY()));
+	        	if(ball.getSpeedY() > 0) 
+	        		ball.setSpeedY(+3 +(ball.getSpeedY()));
+	        	
 	        }
 	      
 	        
 			// check sides
-	        else if (ballX <= 100 || ballX >= WIDTH-145){
-				speedX *= -1;
+	        else if (ball.getBallX() <= 100 || ball.getBallX() >= WIDTH-145){
+	        	ball.setSpeedX(-ball.getSpeedX());
 				
 			}
-	        else if (ballY <= 100 || ballY >= HEIGHT-145){
-	        	speedY *= -1;
+	        else if (ball.getBallY() <= 100 || ball.getBallY() >= HEIGHT-145){
+	        	ball.setSpeedY(-ball.getSpeedY());
 	        	//friction
-	        	if(speedY < 0)
-	        		speedY += 2;
+	        	if(ball.getBallY() < 0)
+	        		ball.setSpeedY(2+ball.getSpeedY());
 	        }
 	        
 	        
