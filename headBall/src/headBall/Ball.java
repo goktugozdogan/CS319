@@ -22,7 +22,8 @@ public class Ball {
 	//constructor
 	public Ball() {
 		
-//		timer = new Timer(DELAY, new BallListener());
+		timer = new Timer(65, new GravityListener());
+		timer.start();
 	//    ball = new ImageIcon ("images/ball.png");
 	//    ballX = 465; //465;
 	//    ballY = 265; //265;
@@ -66,6 +67,13 @@ public class Ball {
 		this.speedY =sy;
 	}
 	
+	
+	private class GravityListener implements ActionListener{
+		public void actionPerformed(ActionEvent event){
+			if(speedY <= 10 && ballY < 570)
+				speedY += 2;
+		}
+	}
 /*	private class BallListener2 implements ActionListener{
 		public void actionPerformed(ActionEvent event){
 			ballX += speedX;
