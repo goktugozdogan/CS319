@@ -22,5 +22,17 @@ public class SoundManage{
 	    }
 	}
 	
+	public void playKickSound() {
+	    try {
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("/home/mehmeterenturanboy/eclipse-workspace/headBall/soundtract/kick.wav").getAbsoluteFile());
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioInputStream);
+	        clip.start();
+	    } catch(Exception ex) {
+	        System.out.println("Error with playing sound.");
+	        ex.printStackTrace();
+	    }
+	}
+	
 
 }

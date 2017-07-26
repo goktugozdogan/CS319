@@ -12,6 +12,7 @@ public class MainPanel extends JPanel{
 	private Goal goalLeft, goalRigth;
 	private Ball ball;
 	private GamePhysic gp;
+	private SoundManage sm;
 	
 	// ronaldo
 	private ImageIcon ronaldo;
@@ -36,6 +37,7 @@ public class MainPanel extends JPanel{
 	
 	
 	public MainPanel(){
+		sm = new SoundManage();
 		goalLeft = new Goal();
 		goalRigth = new Goal();
 		gp = new GamePhysic();
@@ -341,10 +343,12 @@ public class MainPanel extends JPanel{
 	        	ball.setSpeedY(1);
 	        	
 	        	score1 += 1;
+	        	scoreLabel1.setText(""+score1);
 	        	if ( ball.getBallX() <= 23 )
 	    			ball.setSpeedX(0);
 		        if ( ball.getBallY() >= 660)
 		        	ball.setSpeedY(0);
+		        repaint();
 	        }
 	        
 	        // check goal 2
@@ -362,6 +366,7 @@ public class MainPanel extends JPanel{
 	        if ( (l.getY()+78 >= ball.getBallY()+22 && l.getY()<= ball.getBallY()+22)
 	        		&& (l.getX() + 34 >= ball.getBallX() + 22 && l.getX()<= ball.getBallX() + 22 ))
 	        {
+	        	sm.playKickSound();
 	        	ball.setBallX(ball.getBallX()-7);
 	        	ball.setBallY(ball.getBallY()-7);
 	        	ball.setSpeedX(-(ball.getSpeedX()));
@@ -377,6 +382,7 @@ public class MainPanel extends JPanel{
 	        if ( (r.getY() + 84 >= ball.getBallY() + 22 && r.getY() <= ball.getBallY() + 22) 
 	        		&& (r.getX() + 34 >= ball.getBallX()+ 22 && r.getX() <= ball.getBallX() + 22 ))
 	        {
+	        	sm.playKickSound();
 	        	ball.setBallX(ball.getBallX()+7);
 	        	ball.setBallY(ball.getBallY()+7);
 	        	ball.setSpeedX(-(ball.getSpeedX()));
@@ -398,8 +404,11 @@ public class MainPanel extends JPanel{
 	        else if (ball.getBallY() <= 100 || ball.getBallY() >= HEIGHT-145){
 	        	ball.setSpeedY(-ball.getSpeedY());
 	        	//friction
-	        	if(ball.getBallY() < 0)
-	        		ball.setSpeedY(2+ball.getSpeedY());
+	        //	if(ball.getBallY() > -3 && ball.getSpeedY()>1)
+	        //		ball.setSpeedY(1 + ball.getSpeedY());
+	        	 if(ball.getBallY() < 0)
+	        		ball.setSpeedY(2 + ball.getSpeedY());
+	        	
 	        }
 	        
 	        
